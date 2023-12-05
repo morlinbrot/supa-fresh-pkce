@@ -1,0 +1,43 @@
+{
+  "lock": false,
+  "tasks": {
+    "check": "deno fmt --check && deno lint && deno check **/*.ts && deno check **/*.tsx",
+    "start": "deno run -A --watch=static/,routes/ dev.ts",
+    "build": "deno run -A dev.ts build",
+    "preview": "deno run -A main.ts",
+    "update": "deno run -A -r https://fresh.deno.dev/update ."
+  },
+  "lint": {
+    "rules": {
+      "tags": [
+        "fresh",
+        "recommended"
+      ]
+    }
+  },
+  "exclude": [
+    "**/_fresh/*"
+  ],
+  "imports": {
+    "$fresh/": "https://deno.land/x/fresh@1.6.0/",
+    "preact": "https://esm.sh/preact@10.19.2",
+    "preact/": "https://esm.sh/preact@10.19.2/",
+    "@preact/signals": "https://esm.sh/*@preact/signals@1.2.1",
+    "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.0",
+    "tailwindcss": "npm:tailwindcss@3.3.5",
+    "tailwindcss/": "npm:/tailwindcss@3.3.5/",
+    "tailwindcss/plugin": "npm:/tailwindcss@3.3.5/plugin.js",
+    "$std/": "https://deno.land/std@0.208.0/",
+
+    "dotenv/": "https://deno.land/x/dotenv@v3.2.0/",
+    "supabase": "https://esm.sh/@supabase/supabase-js@2.1.0",
+    "components/": "./components/",
+    "islands/": "./islands/",
+    "routes/": "./routes/"
+  },
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact"
+  },
+  "nodeModulesDir": true
+}

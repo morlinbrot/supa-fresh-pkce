@@ -1,17 +1,20 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 
+import { getCookies } from "$std/http/cookie.ts";
 import { Layout, Link } from "components/index.ts";
 import { ServerState } from "../types.ts";
 
 export const handler: Handlers = {
-  GET(_req, ctx) {
+  GET(req, ctx) {
+    const cookies = getCookies(req.headers);
+    ctx.state.user = cookies.auth === "makelemonade" ? {} : null;
     return ctx.render(ctx.state);
   },
 };
 
 export default function Home(props: PageProps<ServerState>) {
   const isAllowed = !!props.state.user;
-  const state = {} as ServerState;
+  const state = props.state as ServerState;
 
   return (
     <Layout state={state}>

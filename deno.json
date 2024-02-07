@@ -30,10 +30,12 @@
     "$std/": "https://deno.land/std@0.208.0/",
 
     "dotenv/": "https://deno.land/x/dotenv@v3.2.0/",
-    "supabase": "https://esm.sh/@supabase/supabase-js@2.1.0",
+    "supabase": "npm:@supabase/supabase-js@2",
+    "supabase/ssr": "npm:@supabase/ssr",
     "components/": "./components/",
     "islands/": "./islands/",
-    "routes/": "./routes/"
+    "routes/": "./routes/",
+    "lib/": "./lib/"
   },
   "compilerOptions": {
     "jsx": "react-jsx",

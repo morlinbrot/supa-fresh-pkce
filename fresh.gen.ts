@@ -4,10 +4,13 @@
 
 import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
+import * as $api_confirm from "./routes/api/confirm.ts";
 import * as $api_sign_in from "./routes/api/sign-in.ts";
 import * as $api_sign_out from "./routes/api/sign-out.ts";
+import * as $api_sign_up from "./routes/api/sign-up.ts";
 import * as $index from "./routes/index.tsx";
 import * as $sign_in from "./routes/sign-in.tsx";
+import * as $sign_up from "./routes/sign-up.tsx";
 import * as $AuthForm from "./islands/AuthForm.tsx";
 import { type Manifest } from "$fresh/server.ts";
 
@@ -15,10 +18,13 @@ const manifest = {
   routes: {
     "./routes/_404.tsx": $_404,
     "./routes/_app.tsx": $_app,
+    "./routes/api/confirm.ts": $api_confirm,
     "./routes/api/sign-in.ts": $api_sign_in,
     "./routes/api/sign-out.ts": $api_sign_out,
+    "./routes/api/sign-up.ts": $api_sign_up,
     "./routes/index.tsx": $index,
     "./routes/sign-in.tsx": $sign_in,
+    "./routes/sign-up.tsx": $sign_up,
   },
   islands: {
     "./islands/AuthForm.tsx": $AuthForm,

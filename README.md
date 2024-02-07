@@ -1,6 +1,7 @@
 # Supa Fresh PKCE
 
-An example app using Deno's [Fresh](https://fresh.deno.dev/) framework and [Supabase](https://supabase.com/) implementing the PKCE authentication scheme.
+An example app using Deno's [Fresh](https://fresh.deno.dev/) framework and
+[Supabase](https://supabase.com/) implementing the PKCE authentication scheme.
 
 ## ⚠ This is a work in progress! ⚠
 
@@ -26,4 +27,3 @@ deno task start
 ```
 
 This will watch the project directory and restart as necessary.
-

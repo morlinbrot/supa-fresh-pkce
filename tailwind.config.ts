@@ -15,7 +15,7 @@ export default {
     },
   },
   plugins: [
-    plugin(function({ addBase, theme }) {
+    plugin(function ({ addBase, theme }) {
       addBase({
         div: {
           alignItems: "center",
@@ -31,7 +31,7 @@ export default {
         p: {
           margin: "8px 0px 8px 0px",
         },
-      })
-    })
+      });
+    }),
   ],
 } satisfies Config;

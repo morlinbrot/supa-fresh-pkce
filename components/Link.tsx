@@ -6,7 +6,9 @@ export function Link(props: JSX.HTMLAttributes<HTMLAnchorElement>) {
     <a
       {...props}
       disabled={!IS_BROWSER || props.disabled}
-      class={`text-primary hover:underline hover:text-primaryStrong ${props.class ?? ""}`}
+      class={`text-primary hover:underline hover:text-primaryStrong ${
+        props.class ?? ""
+      }`}
     />
   );
 }

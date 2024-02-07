@@ -11,7 +11,7 @@ export const handler: Handlers = {
     const token_hash = searchParams.get("token_hash");
     const type = searchParams.get("type") as EmailOtpType | null;
     // TODO: Handle all cases described here: https://supabase.com/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr
-    const next = searchParams.get("next") ?? "/";
+    const next = searchParams.get("next") ?? "/welcome";
 
     const redirectTo = new URL(url);
     redirectTo.pathname = next;

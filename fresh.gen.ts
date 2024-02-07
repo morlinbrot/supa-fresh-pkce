@@ -13,6 +13,7 @@ import * as $index from "./routes/index.tsx";
 import * as $secret from "./routes/secret.tsx";
 import * as $sign_in from "./routes/sign-in.tsx";
 import * as $sign_up from "./routes/sign-up.tsx";
+import * as $welcome from "./routes/welcome.tsx";
 import * as $AuthForm from "./islands/AuthForm.tsx";
 import { type Manifest } from "$fresh/server.ts";
 
@@ -29,6 +30,7 @@ const manifest = {
     "./routes/secret.tsx": $secret,
     "./routes/sign-in.tsx": $sign_in,
     "./routes/sign-up.tsx": $sign_up,
+    "./routes/welcome.tsx": $welcome,
   },
   islands: {
     "./islands/AuthForm.tsx": $AuthForm,

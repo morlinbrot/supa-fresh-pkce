@@ -3,7 +3,7 @@
 An example app using Deno's [Fresh](https://fresh.deno.dev/) framework and
 [Supabase](https://supabase.com/) implementing the PKCE authentication scheme.
 
-## ⚠ This is a work in progress! ⚠
+## 🚧 This is a work in progress! 🚧
 
 [Here's an article]() I wrote about building this.
 
@@ -13,11 +13,10 @@ Consider leaving me a star!
 
 ## Usage
 
-Create a `.env` file with the following variables:
-
+You need a [Supabase account](https://supabase.com/) which you can create for free. Create a `.env` file in the project root containing the following variables:
 ```
 SUPABASE_URL=https://<projectName>.supabase.co
-SUPABASE_KEY=<api_key>
+SUPABASE_ANON_KEY=<api_key>
 ```
 
 Run the app:

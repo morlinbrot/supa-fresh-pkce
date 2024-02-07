@@ -10,10 +10,9 @@ export const handler: Handlers = {
   },
 };
 
-export default function Page(_props: PageProps<ServerState>) {
-  const state = {} as ServerState;
+export default function Page(props: PageProps<null, ServerState>) {
   return (
-    <Layout state={state}>
+    <Layout state={props.state}>
       <div class="flex justify-center">
         <div class="flex flex-col items-stretch w-[500px] md:w-2/3">
           <div class="flex justify-center">

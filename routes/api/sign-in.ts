@@ -1,36 +1,32 @@
 import { Handlers } from "$fresh/server.ts";
-import { setCookie } from "$std/http/cookie.ts";
+
+import { createSupabaseClient } from "lib/supabase.ts";
 
 export const handler: Handlers = {
   async POST(req) {
-    const url = new URL(req.url);
     const form = await req.formData();
+    const email = String(form.get("email"));
+    const password = String(form.get("password"));
 
     const headers = new Headers();
     headers.set("location", "/");
 
-    const email = String(form.get("email"));
-    const password = String(form.get("password"));
+    const supabase = createSupabaseClient(req, headers);
 
-    if (email === "test@example.com" && password === "password1234") {
-      setCookie(headers, {
-        name: "auth",
-        value: "makelemonade",
-        maxAge: 3600,
-        sameSite: "Lax",
-        domain: url.hostname,
-        path: "/",
-        secure: true,
+    const { error } = await supabase.auth
+      .signInWithPassword({
+        email,
+        password,
       });
 
-      return new Response(null, {
-        status: 303,
-        headers,
-      });
-    } else {
-      return new Response(null, {
-        status: 403,
-      });
+    if (error) {
+      // TODO: Add some actual error handling. Differentiate between 500 & 403.
+      return new Response(null, { status: 500 });
     }
+
+    return new Response(null, {
+      status: 303,
+      headers,
+    });
   },
 };

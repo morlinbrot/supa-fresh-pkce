@@ -4,7 +4,8 @@
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
 
-import "$std/dotenv/load.ts";
+import { load } from "$std/dotenv/mod.ts";
+await load({ export: true, allowEmptyValues: true });
 
 import { start } from "$fresh/server.ts";
 import config from "./fresh.config.ts";

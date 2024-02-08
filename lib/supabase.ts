@@ -1,6 +1,9 @@
 import { deleteCookie, getCookies, setCookie } from "$std/http/cookie.ts";
 import { type CookieOptions, createServerClient } from "supabase/ssr";
 
+import { loadSync } from "$std/dotenv/mod.ts";
+loadSync({ export: true, allowEmptyValues: true });
+
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL") || "";
 const SUPABASE_ANON_KEY = Deno.env.get("SUPABASE_ANON_KEY") || "";
 

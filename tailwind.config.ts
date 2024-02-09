@@ -15,7 +15,7 @@ export default {
     },
   },
   plugins: [
-    plugin(function ({ addBase, theme }) {
+    plugin(function ({ addBase }) {
       addBase({
         div: {
           alignItems: "center",

@@ -1,8 +1,9 @@
 import { Handlers } from "$fresh/server.ts";
 import { type EmailOtpType } from "supabase";
 
+import { getLogger } from "lib/logger.ts";
 import { createSupabaseClient } from "lib/supabase.ts";
-import { getLogger } from "../../utils.ts";
+import { storeError, storeMessage } from "lib/messages.ts";
 
 export const handler: Handlers = {
   async GET(req: Request) {
@@ -13,12 +14,12 @@ export const handler: Handlers = {
     const token_hash = searchParams.get("token_hash");
     const type = searchParams.get("type") as EmailOtpType | null;
     // TODO: Handle all cases described here: https://supabase.com/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr
-    const next = searchParams.get("next") ?? "/welcome";
+    const next = searchParams.get("next") ?? "/sign-in";
 
     logger.debug(`Called with type=${type}, token_hash=${token_hash}`);
 
-    const redirectTo = new URL(url);
-    redirectTo.pathname = next;
+    const headers = new Headers();
+    headers.set("location", next);
 
     if (token_hash && type) {
       const supabase = createSupabaseClient(req);
@@ -30,13 +31,18 @@ export const handler: Handlers = {
 
       if (error) {
         logger.error(error);
-        // TODO: Return the user to an error page with some instructions.
-        return Response.redirect(redirectTo);
+        await storeError(headers, error);
+        return new Response(null, { status: 303, headers });
       }
     }
 
-    redirectTo.searchParams.delete("next");
-    logger.debug(`Success. Redirecting to: ${redirectTo.toString()}`);
-    return Response.redirect(redirectTo);
+    await storeMessage(
+      headers,
+      "Thanks for confirming your email address.",
+      "You can now sign in.",
+    );
+
+    logger.debug(`Success. Redirecting to: ${headers.get("location")}`);
+    return new Response(null, { status: 303, headers });
   },
 };

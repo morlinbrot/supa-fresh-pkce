@@ -1,7 +1,8 @@
 import { Handlers } from "$fresh/server.ts";
 
 import { createSupabaseClient } from "lib/supabase.ts";
-import { getLogger } from "../../utils.ts";
+import { storeError, storeMessage } from "lib/messages.ts";
+import { getLogger } from "lib/logger.ts";
 
 export const handler: Handlers = {
   async POST(req) {
@@ -17,7 +18,7 @@ export const handler: Handlers = {
 
     const supabase = createSupabaseClient(req, headers);
 
-    const { error } = await supabase.auth
+    const { error, data: { user } } = await supabase.auth
       .signInWithPassword({
         email,
         password,
@@ -26,8 +27,11 @@ export const handler: Handlers = {
     if (error) {
       // TODO: Add some actual error handling. Differentiate between 500 & 403.
       logger.error(error);
-      return new Response(null, { status: 500 });
+      await storeError(headers, error);
+      return new Response(null, { status: 303, headers });
     }
+
+    await storeMessage(headers, "Welcome back", `${user?.email}`);
 
     logger.debug(`Success. Redirecting to: ${headers.get("location")}`);
     return new Response(null, {

@@ -1,7 +1,8 @@
 import { Handlers } from "$fresh/server.ts";
 import { createSupabaseClient } from "lib/supabase.ts";
 
-import { getLogger } from "../../utils.ts";
+import { getLogger } from "lib/logger.ts";
+import { storeError } from "lib/messages.ts";
 
 export const handler: Handlers = {
   async GET(req) {
@@ -16,6 +17,7 @@ export const handler: Handlers = {
 
     if (error) {
       logger.error(error);
+      await storeError(headers, error);
       return new Response(null, { status: 500, headers });
     }
 

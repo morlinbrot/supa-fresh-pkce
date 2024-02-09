@@ -15,6 +15,8 @@ export function Layout(props: Props) {
     ? { href: "/api/sign-out", text: "Sign Out" }
     : { href: "/sign-in", text: "Sign In" };
 
+  const message = props.state.message;
+
   return (
     <>
       <div class="bg-primary">
@@ -30,7 +32,7 @@ export function Layout(props: Props) {
             </div>
           </a>
 
-          <div class="flex flex-grow border-gray pt-1">
+          <div class="flex flex-grow pt-1">
             <div class="flex flex-grow">
               <NavLink href="/secret">Secret</NavLink>
             </div>
@@ -41,6 +43,18 @@ export function Layout(props: Props) {
           </div>
         </nav>
       </div>
+
+      {message && (
+        <div class="bg-primaryLight">
+          <div class="mx-auto max-w-screen-md pl-4">
+            <div class="flex flex-grow">
+              <p class="text-white">
+                <strong>{message.title}</strong> {message.text}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div class="mx-auto max-w-screen-md p-4">
         {props.children}

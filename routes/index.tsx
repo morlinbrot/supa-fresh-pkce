@@ -1,16 +1,7 @@
-import { FreshContext, Handlers, PageProps } from "$fresh/server.ts";
+import { PageProps } from "$fresh/server.ts";
 
 import { Layout, Link } from "components/index.ts";
-import { retrieveMsg } from "lib/messages.ts";
 import { ServerState } from "../types.ts";
-
-export const handler: Handlers = {
-  async GET(req: Request, ctx: FreshContext) {
-    const message = await retrieveMsg(new URL(req.url));
-    ctx.state.message = message;
-    return ctx.render();
-  },
-};
 
 export default function Home(props: PageProps<ServerState>) {
   const isAllowed = !!props.state.user;

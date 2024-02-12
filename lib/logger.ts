@@ -5,7 +5,7 @@ export const getLogger = (component: string) => {
     debug: (msg: string) => {
       console.debug(`[SFP App::${component}]: ${msg}`);
     },
-    error: (error: AuthError) => {
+    error: (error: AuthError | Error) => {
       console.error(`[SFP App::${component}]: ${error.name}: ${error.message}`);
     },
   };

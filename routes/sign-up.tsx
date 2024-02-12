@@ -1,14 +1,8 @@
-import { Handlers, PageProps } from "$fresh/server.ts";
+import { PageProps } from "$fresh/server.ts";
 
 import { Layout } from "components/index.ts";
 import AuthForm from "islands/AuthForm.tsx";
 import { ServerState } from "../types.ts";
-
-export const handler: Handlers = {
-  GET(_req, ctx) {
-    return ctx.render(ctx.state);
-  },
-};
 
 export default function Page(props: PageProps<null, ServerState>) {
   return (

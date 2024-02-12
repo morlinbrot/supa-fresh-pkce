@@ -7,12 +7,19 @@ import { getLogger } from "lib/logger.ts";
 export const handler: Handlers = {
   async POST(req) {
     const logger = getLogger("sign-in");
-    const form = await req.formData();
-    const email = String(form.get("email"));
-    const password = String(form.get("password"));
 
     const headers = new Headers();
     headers.set("location", "/");
+
+    const form = await req.formData();
+    const email = form.get("email")?.toString();
+    const password = form.get("password")?.toString();
+    if (!email || !password) {
+      const error = new Error("Failed to parse email or password form fields.");
+      logger.error(error);
+      await storeError(headers, error);
+      return new Response(null, { status: 303, headers });
+    }
 
     logger.debug(`Called with email=${email}`);
 

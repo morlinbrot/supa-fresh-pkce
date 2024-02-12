@@ -2,8 +2,8 @@
   "lock": false,
   "tasks": {
     "check": "deno fmt --check && deno lint && deno check **/*.ts  && deno check --unstable-kv **/*.tsx",
-    "start": "deno run -A --unstable-kv --watch=static/,routes/ dev.ts",
-    "build": "deno run -A --unstable-kv dev.ts build",
+    "start": "deno run --unstable-kv --allow-env --allow-read --allow-write --allow-run --allow-net --env --watch=static/,routes/ dev.ts",
+    "build": "deno run -A --unstable-kv --env dev.ts build",
     "preview": "deno run -A main.ts",
     "update": "deno run -A -r https://fresh.deno.dev/update ."
   },

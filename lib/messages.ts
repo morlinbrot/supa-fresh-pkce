@@ -33,13 +33,13 @@ export async function storeMessage(
 // Store a Supabase `AuthError` as `ServerMessage` in `Deno.Kv`.
 export function storeError(
   headers: Headers,
-  error: AuthError,
+  error: AuthError | Error,
 ): Promise<string> {
   return storeMessage(
     headers,
     error.name,
     error.message,
-    error.status,
+    (error as AuthError).status ?? 500,
   );
 }
 

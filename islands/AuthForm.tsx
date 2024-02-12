@@ -26,7 +26,11 @@ export default function AuthForm({ mode }: Props) {
         <h2 class="my-4">{buttProps.title}</h2>
       </div>
 
-      <form method="post" class="flex flex-col space-y-4 min-w-0">
+      <form
+        action={"/api" + buttProps.href}
+        method="post"
+        class="flex flex-col space-y-4 min-w-0"
+      >
         <Input
           autofocus
           type="email"
@@ -39,7 +43,6 @@ export default function AuthForm({ mode }: Props) {
 
         <FormButton
           type="submit"
-          formAction={"/api" + buttProps.href}
           class="!mt-8"
         >
           {buttProps.title}

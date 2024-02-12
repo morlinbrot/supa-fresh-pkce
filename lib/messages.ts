@@ -1,4 +1,5 @@
 import { type AuthError } from "supabase";
+import { KvId, kvRetrieve, kvStore } from "lib/kvCache.ts";
 
 export interface ServerMessage {
   title: string;
@@ -6,35 +7,23 @@ export interface ServerMessage {
   code: number | null;
 }
 
-export const MESSAGE_KEY = "mid";
-
-// Generate an id with very basic uniqueness algorithm.
-export function genMsgId() {
-  return `msgId-${Date.now()}${Math.floor(Math.random() * 1000)}`;
-}
-
-// Store a `ServerMessage` in Deno.Kv, and store its id as a cookie.
+// Store a `ServerMessage` in Deno.Kv, and store its generated id as a search parameter in `headers`.
 export async function storeMessage(
   headers: Headers,
   title: string,
   text: string,
   code?: number,
-): Promise<string> {
-  const mid = genMsgId();
-  const kv = await Deno.openKv();
-  await kv.set(["messages", mid], { title, text, code });
-
-  const location = `${headers.get("location") || "/"}?${MESSAGE_KEY}=${mid}`;
-  headers.set("location", location);
-
-  return mid;
+): Promise<KvId> {
+  return await kvStore(headers, "messages", { title, text, code }, {
+    expireIn: 5000,
+  });
 }
 
-// Store a Supabase `AuthError` as `ServerMessage` in `Deno.Kv`.
+// Store an `Error` or Supabase `AuthError` as `ServerMessage` in `Deno.Kv`.
 export function storeError(
   headers: Headers,
   error: AuthError | Error,
-): Promise<string> {
+): Promise<KvId> {
   return storeMessage(
     headers,
     error.name,
@@ -43,19 +32,9 @@ export function storeError(
   );
 }
 
-// Retrieve a message from `Deno.Kv`.
-export async function kvGetMsg(id: string): Promise<ServerMessage | null> {
-  const kv = await Deno.openKv();
-  const res = await kv.get<ServerMessage>(["messages", id]);
-  return res.value;
-}
-
-// Extract message id from search params adn retrieve message from `Deno.Kv`.
+// Extract an id from `url` and retrieve the message from `Deno.Kv`.
 export async function retrieveMsg(
   url: URL | string,
 ): Promise<ServerMessage | null> {
-  const u = typeof url === "string" ? new URL(url) : url;
-  const id = u.searchParams.get(MESSAGE_KEY);
-  if (!id) return null;
-  return await kvGetMsg(id);
+  return await kvRetrieve(url, "messages");
 }

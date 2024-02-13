@@ -11,8 +11,15 @@ export type KvId = string;
 export const KV_KEY = "kvid";
 
 // Generate an id with very basic uniqueness algorithm.
-export function genKvId(): KvId {
+export function kvGenId(): KvId {
   return `${Date.now()}${Math.floor(Math.random() * 1000)}`;
+}
+
+// Extract a `KvId` from `url` search parameters.
+export function kvRetrieveId(url: URL | string): KvId | null {
+  const u = typeof url === "string" ? new URL(url) : url;
+  const id = u.searchParams.get(KV_KEY);
+  return id || null;
 }
 
 // Store `value` in `Deno.Kv` under a generated id and set the id as `KV_KEY` search parameter in `headers`.
@@ -22,7 +29,7 @@ export async function kvStore<T>(
   value: T,
   options: object = {},
 ): Promise<string> {
-  const id = genKvId();
+  const id = kvGenId();
   const kv = await Deno.openKv();
   await kv.set([prefix, id], value, options);
 
@@ -37,8 +44,7 @@ export async function kvRetrieve<T>(
   url: URL | string,
   prefix: string,
 ): Promise<T | null> {
-  const u = typeof url === "string" ? new URL(url) : url;
-  const id = u.searchParams.get(KV_KEY);
+  const id = kvRetrieveId(url);
   if (!id) return null;
 
   const key = [prefix, id];

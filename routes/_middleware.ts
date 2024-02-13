@@ -4,22 +4,25 @@ import { createSupabaseClient } from "lib/supabase.ts";
 import { getLogger } from "lib/logger.ts";
 import { retrieveMsg } from "lib/messages.ts";
 import { ServerState } from "../types.ts";
+import { kvRetrieveId } from "lib/kvCache.ts";
 
 export const handler = [
   async function authMiddleware(
     req: Request,
     ctx: FreshContext<ServerState>,
   ) {
-    const logger = getLogger("authMiddleware");
     // We don't care about internal and static routes.
     if (ctx.destination != "route") return ctx.next();
+
+    const logger = getLogger("authMiddleware");
 
     const url = new URL(req.url);
     const headers = new Headers();
     headers.set("location", "/");
 
     const isProtectedRoute = url.pathname.includes("secret") ||
-      url.pathname.includes("welcome");
+      url.pathname.includes("welcome") ||
+      url.pathname.includes("update-password");
 
     const supabase = createSupabaseClient(req, headers);
     // NOTE: Always use `getUser` instead of `getSession` as this calls the Supabase API and revalidates the token!
@@ -34,17 +37,19 @@ export const handler = [
       return new Response(null, { status: 500 });
     }
 
-    // A user object is only mandatory if a protected route has been requested.
     if (isProtectedRoute && !user) {
       // Classic case of 403 but we want to redirect to the home page.
       logger.debug(`403 Redirecting to ${headers.get("location")}`);
       return new Response(null, { status: 303, headers });
     }
 
-    // Pass the user information to the frontend.
     ctx.state.user = user;
 
-    logger.debug(`Calling next for user.email=${user?.email}`);
+    logger.debug(
+      `Calling next for user.email=${user?.email}, location=${
+        headers.get("location")
+      }`,
+    );
     return ctx.next();
   },
   // Looks for message id search params, retrieves the message and passes it as `ctx.state.message`.
@@ -52,10 +57,17 @@ export const handler = [
     req: Request,
     ctx: FreshContext<ServerState>,
   ) {
-    const redirectTo = new URL(req.url);
-    const message = await retrieveMsg(redirectTo);
-    ctx.state.message = message;
-    // ctx.url = redirectTo;
+    if (ctx.destination != "route") return ctx.next();
+
+    const logger = getLogger("serverMessageMiddleware");
+
+    const url = new URL(req.url);
+    const mid = kvRetrieveId(url);
+    if (mid) {
+      logger.debug(`Retrieving message with id=${mid}`);
+      const message = await retrieveMsg(url);
+      ctx.state.message = message;
+    }
     return ctx.next();
   },
 ];

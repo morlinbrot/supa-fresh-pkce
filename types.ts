@@ -14,11 +14,6 @@ export type ServerState = {
   data: ServerData | null;
 };
 
-export enum RecoverMode {
-  Set = "set",
-  Reset = "reset",
-}
-
 export function parseRecoverMode(mode: string | null): RecoverMode | null {
   return mode?.toLowerCase() === "set" ? RecoverMode.Set : RecoverMode.Reset;
 }

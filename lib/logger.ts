@@ -1,6 +1,11 @@
 import { AuthError } from "supabase";
 
-export const getLogger = (component: string) => {
+export interface Logger {
+  debug: (msg: string) => void;
+  error: (error: AuthError | Error) => void;
+}
+
+export const getLogger = (component: string): Logger => {
   return {
     debug: (msg: string) => {
       console.debug(`[SFP App::${component}]: ${msg}`);

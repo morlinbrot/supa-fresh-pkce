@@ -48,9 +48,17 @@ export default function AuthForm({ mode }: Props) {
           {buttProps.title}
         </FormButton>
 
-        <p>
-          {footProps.text} <Link href={footProps.href}>{footProps.title}</Link>
-        </p>
+        <div className="flex justify-between">
+          <span>
+            {footProps.text}{" "}
+            <Link href={footProps.href}>{footProps.title}</Link>
+          </span>
+          {mode === "In" && (
+            <span>
+              Forgot password? <Link href="/recover">Recover</Link>
+            </span>
+          )}
+        </div>
       </form>
     </div>
   );

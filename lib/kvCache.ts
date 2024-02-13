@@ -1,9 +1,11 @@
-// The module serves as a messaging system between `/api` endpoints ("back-end") and non-API route
-// handlers ("front-end") in order to pass errors and other information from the back-end to the user.
-// In the context of sever-side rendering, there is no elegant way of passing information through a
-// redirect which is why we're using `Deno.Kv` to store (possibly sensitive) data, generate an id and
-// pass only that as a search param. A middleware can intercept the ids, retrieve the data and attach it
-// to `FreshContext.state` to pass it to the page that is about to be rendered.
+/**
+ * The module serves as a messaging system between `/api` endpoints ("back-end") and non-API route
+ * handlers ("front-end") in order to pass errors and other information from the back-end to the user.
+ * In the context of sever-side rendering, there is no elegant way of passing information through a
+ * redirect which is why we're using `Deno.Kv` to store (possibly sensitive) data, generate an id and
+ * pass only that as a search param. A middleware can intercept the ids, retrieve the data and attach it
+ * to `FreshContext.state` to pass it to the page that is about to be rendered.
+ */
 
 export type KvId = string;
 
@@ -15,14 +17,18 @@ export function kvGenId(): KvId {
   return `${Date.now()}${Math.floor(Math.random() * 1000)}`;
 }
 
-// Extract a `KvId` from `url` search parameters.
+/**
+ * Extract a `KvId` from `url` search parameters.
+ */
 export function kvRetrieveId(url: URL | string): KvId | null {
   const u = typeof url === "string" ? new URL(url) : url;
   const id = u.searchParams.get(KV_KEY);
   return id || null;
 }
 
-// Store `value` in `Deno.Kv` under a generated id and set the id as `KV_KEY` search parameter in `headers`.
+/**
+ * Store `value` in `Deno.Kv` under a generated id and set the id as `KV_KEY` search parameter in `headers`.
+ */
 export async function kvStore<T>(
   headers: Headers,
   prefix: string,
@@ -39,7 +45,9 @@ export async function kvStore<T>(
   return id;
 }
 
-// Extract a `KV_KEY` from the search params of `url` and retrieve its value from `Deno.Kv`.
+/**
+ * Extract a `KV_KEY` from the search params of `url` and retrieve its value from `Deno.Kv`.
+ */
 export async function kvRetrieve<T>(
   url: URL | string,
   prefix: string,

@@ -1,42 +1,30 @@
 import { Handlers } from "$fresh/server.ts";
 import { createSupabaseClient } from "lib/supabase.ts";
 
-import { getLogger } from "lib/logger.ts";
-import { storeError, storeMessage } from "lib/messages.ts";
-import { setLocation } from "lib/utils.ts";
+import { storeMessage } from "lib/messages.ts";
+import { bail, prepareResponse, setLocation } from "lib/utils.ts";
 
 export const handler: Handlers = {
   async POST(req: Request) {
-    const logger = getLogger("sign-in");
-
-    const url = new URL(req.url);
-
-    const headers = new Headers();
-    headers.set("location", "/");
+    const { headers, logger, url } = prepareResponse(req, "update-password");
 
     const form = await req.formData();
     const password = form.get("password")?.toString();
 
-    const supabase = createSupabaseClient(req, headers);
+    logger.debug("Called.");
 
+    const supabase = createSupabaseClient(req, headers);
     const { error } = await supabase.auth.updateUser({ password });
 
     if (error) {
-      logger.error(error);
-      if (
-        error && error.status === 422 &&
-        error.message.includes("should be different")
-      ) {
+      if (error.status === 422 && error.message.includes("be different")) {
         setLocation(headers, url, "update-password");
-        await storeError(headers, error);
-      } else {
-        setLocation(headers, url, "/");
+        return bail(headers, logger, error);
       }
 
-      return new Response(null, { status: 303, headers });
+      return bail(headers, logger, error, true);
     }
 
-    setLocation(headers, url, "/");
     await storeMessage(headers, "Password updated.", "");
 
     logger.debug(

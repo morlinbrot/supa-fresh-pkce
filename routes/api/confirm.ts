@@ -1,23 +1,19 @@
 import { Handlers } from "$fresh/server.ts";
 import { type EmailOtpType } from "supabase";
 
-import { getLogger } from "lib/logger.ts";
 import { storeMessage } from "lib/messages.ts";
 import { createSupabaseClient } from "lib/supabase.ts";
-import { bail, setLocation } from "lib/utils.ts";
+import { bail, prepareResponse, setLocation } from "lib/utils.ts";
 
 export const handler: Handlers = {
   async GET(req: Request) {
-    const logger = getLogger("confirm");
-    const url = new URL(req.url);
+    const { headers, logger, url } = prepareResponse(req, "confirm");
 
     const { searchParams } = url;
     const token_hash = searchParams.get("token_hash");
     const type = searchParams.get("type") as EmailOtpType | null;
 
     logger.debug(`Called with type=${type}, token_hash=${token_hash}`);
-
-    const headers = new Headers();
 
     if (token_hash && type) {
       const supabase = createSupabaseClient(req, headers);

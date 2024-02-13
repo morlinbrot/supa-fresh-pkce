@@ -1,10 +1,10 @@
 import { FreshContext } from "$fresh/server.ts";
 import { createSupabaseClient } from "lib/supabase.ts";
 
-import { getLogger } from "lib/logger.ts";
-import { retrieveMsg } from "lib/messages.ts";
-import { ServerState } from "../types.ts";
 import { kvRetrieveId } from "lib/kvCache.ts";
+import { retrieveMsg } from "lib/messages.ts";
+import { bail, prepareResponse } from "lib/utils.ts";
+import { ServerState } from "../types.ts";
 
 export const handler = [
   async function authMiddleware(
@@ -14,11 +14,7 @@ export const handler = [
     // We don't care about internal and static routes.
     if (ctx.destination != "route") return ctx.next();
 
-    const logger = getLogger("authMiddleware");
-
-    const url = new URL(req.url);
-    const headers = new Headers();
-    headers.set("location", "/");
+    const { headers, logger, url } = prepareResponse(req, "authMiddleware");
 
     const isProtectedRoute = url.pathname.includes("secret") ||
       url.pathname.includes("welcome") ||
@@ -32,14 +28,12 @@ export const handler = [
 
     // Don't mind 401 as it just means no credentials were provided, e.g. there was no session cookie.
     if (error && error.status !== 401) {
-      // TODO: Add some actual error handling. Differentiate between 500 & 403.
-      logger.error(error);
-      return new Response(null, { status: 500 });
+      return bail(headers, logger, error, true);
     }
 
     if (isProtectedRoute && !user) {
       // Classic case of 403 but we want to redirect to the home page.
-      logger.debug(`403 Redirecting to ${headers.get("location")}`);
+      logger.debug(`403 caught. Redirecting to ${headers.get("location")}`);
       return new Response(null, { status: 303, headers });
     }
 
@@ -59,15 +53,15 @@ export const handler = [
   ) {
     if (ctx.destination != "route") return ctx.next();
 
-    const logger = getLogger("serverMessageMiddleware");
+    const { logger, url } = prepareResponse(req, "serverMessageMiddleware");
 
-    const url = new URL(req.url);
     const mid = kvRetrieveId(url);
     if (mid) {
       logger.debug(`Retrieving message with id=${mid}`);
       const message = await retrieveMsg(url);
       ctx.state.message = message;
     }
+
     return ctx.next();
   },
 ];

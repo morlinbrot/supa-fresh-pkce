@@ -1,25 +1,18 @@
 import { Handlers } from "$fresh/server.ts";
 import { createSupabaseClient } from "lib/supabase.ts";
 
-import { getLogger } from "lib/logger.ts";
-import { storeError } from "lib/messages.ts";
+import { bail, prepareResponse } from "lib/utils.ts";
 
 export const handler: Handlers = {
-  async GET(req) {
-    const logger = getLogger("sign-out");
-    const headers = new Headers();
-    headers.set("location", "/");
+  async GET(req: Request) {
+    const { headers, logger } = prepareResponse(req, "sign-out");
 
     logger.debug(`Called`);
 
     const supabase = createSupabaseClient(req, headers);
     const { error } = await supabase.auth.signOut();
 
-    if (error) {
-      logger.error(error);
-      await storeError(headers, error);
-      return new Response(null, { status: 500, headers });
-    }
+    if (error) return bail(headers, logger, error, true);
 
     logger.debug(`Success. Redirecting to: ${headers.get("location")}`);
     return new Response(null, {

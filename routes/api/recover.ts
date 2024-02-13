@@ -1,16 +1,11 @@
 import { Handlers } from "$fresh/server.ts";
 
 import { createSupabaseClient } from "lib/supabase.ts";
-import { getLogger } from "lib/logger.ts";
-import { bail, setLocation } from "lib/utils.ts";
+import { bail, prepareResponse } from "lib/utils.ts";
 
 export const handler: Handlers = {
   async POST(req: Request) {
-    const logger = getLogger("recover");
-
-    const url = new URL(req.url);
-    const headers = new Headers();
-    setLocation(headers, url, "/");
+    const { headers, logger } = prepareResponse(req, "recover");
 
     const form = await req.formData();
     const email = form.get("email")?.toString();
@@ -23,7 +18,7 @@ export const handler: Handlers = {
 
     const supabase = createSupabaseClient(req, headers);
     const { error } = await supabase.auth.resetPasswordForEmail(email);
-    if (error) bail(headers, logger, error, true);
+    if (error) return bail(headers, logger, error, true);
 
     logger.debug(`Success. Redirecting to location=${headers.get("location")}`);
     return new Response(null, { status: 303, headers });

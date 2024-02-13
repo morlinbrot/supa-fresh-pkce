@@ -13,7 +13,3 @@ export type ServerState = {
   // A way to pass data between different page renders.
   data: ServerData | null;
 };
-
-export function parseRecoverMode(mode: string | null): RecoverMode | null {
-  return mode?.toLowerCase() === "set" ? RecoverMode.Set : RecoverMode.Reset;
-}

@@ -3,10 +3,6 @@
 An example app using Deno's [Fresh](https://fresh.deno.dev/) framework and
 [Supabase](https://supabase.com/) implementing the PKCE authentication scheme.
 
-## 🚧 This is a work in progress! 🚧
-
-[Here's an article]() I wrote about building this.
-
 If you like the app, consider leaving me a star!
 
 [![Github Repo Stars](https://img.shields.io/github/stars/morlinbrot/supa-fresh-pkce?style=social)](https://github.com/morlinbrot/supa-fresh-pkce)

@@ -21,13 +21,19 @@ export const handler = [
       url.pathname.includes("update-password");
 
     const supabase = createSupabaseClient(req, headers);
+    // const hasAuthHeader = headers.forEach((val, key) => {
+    //   console.log("HEADER: ", key, val);
+    // });
+
     // NOTE: Always use `getUser` instead of `getSession` as this calls the Supabase API and revalidates the token!
     const { error, data: { user } } = await supabase.auth.getUser();
 
     logger.debug(`"${url.pathname}" called for user.email=${user?.email}`);
 
     // Don't mind 401 as it just means no credentials were provided, e.g. there was no session cookie.
-    if (error && error.status !== 401) {
+    // FIXME: Handle 403 differently.
+    // Currently: If no header is set on the request, `createSupabaseClient` still creates an empty one that leads to a 403. Fix is probably to refactor the  middleware so it only creates the client if a header is set.
+    if (error && error.status !== 401 && error.status !== 403) {
       return bail(headers, logger, error, true);
     }
 

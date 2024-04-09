@@ -24,6 +24,20 @@ export const handler: Handlers = {
       password,
     });
 
+    if (
+      error && error.status === 400 && error.message.includes("not confirmed")
+    ) {
+      logger.debug(
+        `Email not confirmed. Redirecting to: ${headers.get("location")}`,
+      );
+      await storeMessage(
+        headers,
+        "Email not confirmed.",
+        "Please confirm your email address before signing in.",
+      );
+      return new Response(null, { status: 303, headers });
+    }
+
     if (error) return bail(headers, logger, error, true);
 
     await storeMessage(headers, "Welcome back", `${user?.email}`);

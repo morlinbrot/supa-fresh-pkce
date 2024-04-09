@@ -29,7 +29,7 @@ export const handler: Handlers = {
     await storeMessage(
       headers,
       "Thanks for signing up.",
-      "Please confirm your email address to sign in.",
+      "Please confirm your email address before signing in.",
     );
 
     logger.debug(`Success. Redirecting to: ${headers.get("location")}`);

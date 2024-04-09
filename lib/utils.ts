@@ -10,12 +10,18 @@ import { getLogger, Logger } from "lib/logger.ts";
 export function prepareResponse(
   req: Request,
   loggerName: string,
-  location = "/",
+  // The pathname to set the return `url` to.
+  path = "/",
+  // Turns `pathname` into a slug, e.g. will append to path instead of overwriting.
+  isSlug = false,
 ): { headers: Headers; logger: Logger; url: URL } {
   const logger = getLogger(loggerName);
   const headers = new Headers();
   const url = new URL(req.url);
-  headers.set("location", location);
+
+  url.pathname = isSlug ? `${url.pathname}/${path.replace(/^\//, "")}` : path;
+  headers.set("location", url.toString());
+
   return { headers, logger, url };
 }
 

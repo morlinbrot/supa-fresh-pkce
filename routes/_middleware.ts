@@ -14,11 +14,11 @@ export const handler = [
     // We don't care about internal and static routes.
     if (ctx.destination != "route") return ctx.next();
 
-    const { headers, logger, url } = prepareResponse(req, "authMiddleware");
+    const isProtectedRoute = req.url.includes("secret") ||
+      req.url.includes("welcome") ||
+      req.url.includes("update-password");
 
-    const isProtectedRoute = url.pathname.includes("secret") ||
-      url.pathname.includes("welcome") ||
-      url.pathname.includes("update-password");
+    const { headers, logger, url } = prepareResponse(req, "authMiddleware");
 
     const supabase = createSupabaseClient(req, headers);
     // const hasAuthHeader = headers.forEach((val, key) => {

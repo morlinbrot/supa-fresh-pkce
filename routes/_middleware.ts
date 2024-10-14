@@ -3,14 +3,11 @@ import { createSupabaseClient } from "lib/supabase.ts";
 
 import { kvRetrieveId } from "lib/kvCache.ts";
 import { retrieveMsg } from "lib/messages.ts";
-import { bail, prepareResponse } from "lib/utils.ts";
+import { bail, prepareResponse, setLocation } from "lib/utils.ts";
 import { ServerState } from "../types.ts";
 
 export const handler = [
-  async function authMiddleware(
-    req: Request,
-    ctx: FreshContext<ServerState>,
-  ) {
+  async function authMiddleware(req: Request, ctx: FreshContext<ServerState>) {
     // We don't care about internal and static routes.
     if (ctx.destination != "route") return ctx.next();
 
@@ -21,24 +18,29 @@ export const handler = [
     const { headers, logger, url } = prepareResponse(req, "authMiddleware");
 
     const supabase = createSupabaseClient(req, headers);
-    // const hasAuthHeader = headers.forEach((val, key) => {
-    //   console.log("HEADER: ", key, val);
-    // });
 
-    // NOTE: Always use `getUser` instead of `getSession` as this calls the Supabase API and revalidates the token!
-    const { error, data: { user } } = await supabase.auth.getUser();
+    // From the docs at https://supabase.com/docs/guides/auth/server-side/nextjs:
+    // Be careful when protecting pages. The server gets the user session from the cookies, which can be spoofed by anyone.
+    // Always use supabase.auth.getUser() to protect pages and user data. Never trust supabase.auth.getSession()
+    // inside server code such as middleware. It isn't guaranteed to revalidate the Auth token.
+    // IMPORTANT: Avoid writing any logic between createServerClient and
+    // supabase.auth.getUser(). A simple mistake could make it very hard to debug
+    // issues with users being randomly logged out.
+    const {
+      error,
+      data: { user },
+    } = await supabase.auth.getUser();
 
     logger.debug(`"${url.pathname}" called for user.email=${user?.email}`);
 
-    // Don't mind 401 as it just means no credentials were provided, e.g. there was no session cookie.
-    // FIXME: Handle 403 differently.
-    // Currently: If no header is set on the request, `createSupabaseClient` still creates an empty one that leads to a 403. Fix is probably to refactor the  middleware so it only creates the client if a header is set.
-    if (error && error.status !== 401 && error.status !== 403) {
+    // 400 AuthSessionMissingError, e.g. no session data in cookies, we just want to redirect below.
+    if (error && error.status !== 400) {
       return bail(headers, logger, error, true);
     }
 
     if (isProtectedRoute && !user) {
-      // Classic case of 403 but we want to redirect to the home page.
+      // Classic case of 403 but instead of just throwing that and leaving the UI busted, we want to redirect to the home page.
+      setLocation(headers, url, "/sign-in");
       logger.debug(`403 caught. Redirecting to ${headers.get("location")}`);
       return new Response(null, { status: 303, headers });
     }
@@ -47,7 +49,9 @@ export const handler = [
 
     logger.debug(
       `Calling next for user.email=${user?.email}, location=${
-        headers.get("location")
+        headers.get(
+          "location",
+        )
       }`,
     );
     return ctx.next();

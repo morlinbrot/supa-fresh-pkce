@@ -1,4 +1,4 @@
-import { AuthError } from "supabase";
+import { AuthError } from "@supabase/supabase-js";
 
 import { storeError } from "lib/messages.ts";
 import { getLogger, Logger } from "lib/logger.ts";

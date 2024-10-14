@@ -1,4 +1,4 @@
-import { User } from "supabase";
+import { User } from "@supabase/supabase-js";
 
 import { ServerMessage } from "lib/messages.ts";
 import { ServerData } from "lib/serverData.ts";

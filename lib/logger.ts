@@ -1,4 +1,4 @@
-import { AuthError } from "supabase";
+import { AuthError } from "@supabase/supabase-js";
 
 export interface Logger {
   debug: (msg: string) => void;
@@ -11,7 +11,11 @@ export const getLogger = (component: string): Logger => {
       console.debug(`[SFP App::${component}]: ${msg}`);
     },
     error: (error: AuthError | Error) => {
-      console.error(`[SFP App::${component}]: ${error.name}: ${error.message}`);
+      console.error(
+        `[SFP App::${component}]: ${
+          (error as AuthError).status || ""
+        }${error.name}: ${error.message}`,
+      );
     },
   };
 };

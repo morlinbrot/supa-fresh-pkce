@@ -1,4 +1,4 @@
-import { type AuthError } from "supabase";
+import { type AuthError } from "@supabase/supabase-js";
 import { KvId, kvRetrieve, kvStore } from "lib/kvCache.ts";
 
 export interface ServerMessage {
@@ -14,9 +14,14 @@ export async function storeMessage(
   text: string,
   code?: number,
 ): Promise<KvId> {
-  return await kvStore(headers, "messages", { title, text, code }, {
-    expireIn: 5000,
-  });
+  return await kvStore(
+    headers,
+    "messages",
+    { title, text, code },
+    {
+      expireIn: 5000,
+    },
+  );
 }
 
 // Store an `Error` or Supabase `AuthError` as `ServerMessage` in `Deno.Kv`.

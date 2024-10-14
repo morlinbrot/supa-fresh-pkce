@@ -1,4 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
+import { AuthRetryableFetchError } from "@supabase/supabase-js";
 
 import { storeMessage } from "lib/messages.ts";
 import { createSupabaseClient } from "lib/supabase.ts";
@@ -19,13 +20,19 @@ export const handler: Handlers = {
     logger.debug(`Called with email=${email}`);
 
     const supabase = createSupabaseClient(req, headers);
-    const { error, data: { user } } = await supabase.auth.signInWithPassword({
+
+    const {
+      error,
+      data: { user },
+    } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (
-      error && error.status === 400 && error.message.includes("not confirmed")
+      error &&
+      error.status === 400 &&
+      error.message.includes("not confirmed")
     ) {
       logger.debug(
         `Email not confirmed. Redirecting to: ${headers.get("location")}`,
@@ -38,7 +45,15 @@ export const handler: Handlers = {
       return new Response(null, { status: 303, headers });
     }
 
-    if (error) return bail(headers, logger, error, true);
+    if (error) {
+      if (error instanceof AuthRetryableFetchError) {
+        logger.debug(
+          "AuthRetryableFetchError: Is the Supabase project currently paused?",
+        );
+      }
+
+      return bail(headers, logger, error, true);
+    }
 
     await storeMessage(headers, "Welcome back", `${user?.email}`);
 

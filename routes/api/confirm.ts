@@ -1,5 +1,5 @@
 import { Handlers } from "$fresh/server.ts";
-import { type EmailOtpType } from "supabase";
+import { type EmailOtpType } from "@supabase/supabase-js";
 
 import { storeMessage } from "lib/messages.ts";
 import { createSupabaseClient } from "lib/supabase.ts";

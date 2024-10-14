@@ -20,7 +20,7 @@ import * as $update_password from "./routes/update-password.tsx";
 import * as $welcome from "./routes/welcome.tsx";
 import * as $AuthForm from "./islands/AuthForm.tsx";
 import * as $RecoverForm from "./islands/RecoverForm.tsx";
-import { type Manifest } from "$fresh/server.ts";
+import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
   routes: {
